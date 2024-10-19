@@ -32,7 +32,7 @@ class WeatherService {
     this.cityName = "";
   }
   
-  // TODO: Create buildWeatherQuery method
+  // Create buildWeatherQuery method
   private buildWeatherQuery(coordinates: Coordinates): string {
     const params = new URLSearchParams({
       q: coordinates.name,
@@ -42,9 +42,16 @@ class WeatherService {
 
     return queryString;
   }
-  // TODO: Create fetchWeatherData method
+  // Create fetchWeatherData method
   private async fetchWeatherData(coordinates: Coordinates) {
-    
+    try{
+      fetch(this.buildWeatherQuery(coordinates))
+      .then((data) => {
+        // TODO: What does this do?
+      });
+    }catch(err){
+      console.error(`[ERROR] Something went wrong: ${err}`)
+    }
   }
   // TODO: Build parseCurrentWeather method
   private parseCurrentWeather(response: any) {}
