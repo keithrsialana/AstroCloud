@@ -1,30 +1,47 @@
 import { Router, type Request, type Response } from 'express';
 const router = Router();
 
-// remove later
-import dotenv from 'dotenv';
-dotenv.config();
-console.log(process.env.API_BASE_URL);
-console.log(process.env.API_KEY);
+import WeatherService from '../../service/weatherService.js';
+import HistoryService from '../../service/historyService.js';
+// set weatherservice stuff
+WeatherService.baseURL = process.env.API_BASE_URL;
+WeatherService.apiKey = process.env.API_KEY;
 
-// import HistoryService from '../../service/historyService.js';
-// import WeatherService from '../../service/weatherService.js';
-
-// TODO: POST Request with city name to retrieve weather data
-router.post('/', (_req: Request, _res: Response) => {
-  // TODO: GET weather data from city name
-  console.log(_req.params);
-  // TODO: save city to search history
+// POST Request with city name to retrieve weather data
+// localhost:3001/api/weather/
+router.post('/', async (req: Request, res: Response) => {
+  // GET weather data from city name
+  const weatherArray = await WeatherService.getWeatherForCity(req.body.cityName);
+  
+  // save city to search history
+  const cityHistory = await HistoryService.getCities();
+  if (cityHistory){
+    const foundCity = await cityHistory.find((element) => element.name === weatherArray[0].city)
+    // if the city doesn't exist, add it to the database
+    if(!foundCity)
+      await HistoryService.addCity(weatherArray[0].city);
+  }else{
+    // if the array is empty, add the first city
+    await HistoryService.addCity(weatherArray[0].city);
+  }
+  // return REST response
+  res.send(weatherArray);
 });
 
-// TODO: GET search history
-router.get('/history', async (_req: Request, _res: Response) => {
-  console.log('history ayylmao');
+// GET search history
+// localhost:3001/api/weather/history
+router.get('/history', async (_req: Request, res: Response) => {
+  const cities = await HistoryService.getCities();
+  res.send(cities);
 });
 
-// * BONUS TODO: DELETE city from search history
-router.delete('/history/:id', async (req: Request, _res: Response) => {
+// DELETE city from search history
+// localhost:3001/api/weather/history/:id
+router.delete('/history/:id', async (req: Request, res: Response) => {
   console.log(req.params.id);
+  let response = HistoryService.removeCity(req.params.id);
+
+  res.send(response);
 });
 
 export default router;

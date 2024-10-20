@@ -4,6 +4,7 @@ const router = Router();
 import apiRoutes from './api/index.js';
 import htmlRoutes from './htmlRoutes.js';
 
+// localhost:3001/api
 router.use('/api', apiRoutes);
 router.use('/', htmlRoutes);
 
