@@ -11,16 +11,19 @@ WeatherService.apiKey = process.env.API_KEY;
 // localhost:3001/api/weather/
 router.post('/', async (req: Request, res: Response) => {
   // GET weather data from city name
-  const weatherArray = await WeatherService.getWeatherForCity(req.body.cityName);
-  
+  let weatherArray: any[] = [];
+  try { weatherArray = await WeatherService.getWeatherForCity(req.body.cityName); } catch (err) {
+    res.status(404).send('Somesthing went wrong with trying to get weather information.')
+  }
+
   // save city to search history
   const cityHistory = await HistoryService.getCities();
-  if (cityHistory){
+  if (cityHistory) {
     const foundCity = await cityHistory.find((element) => element.name === weatherArray[0].city)
     // if the city doesn't exist, add it to the database
-    if(!foundCity)
+    if (!foundCity)
       await HistoryService.addCity(weatherArray[0].city);
-  }else{
+  } else {
     // if the array is empty, add the first city
     await HistoryService.addCity(weatherArray[0].city);
   }
