@@ -38,7 +38,6 @@ router.get('/history', async (_req: Request, res: Response) => {
 // DELETE city from search history
 // localhost:3001/api/weather/history/:id
 router.delete('/history/:id', async (req: Request, res: Response) => {
-  console.log(req.params.id);
   let response = HistoryService.removeCity(req.params.id);
 
   res.send(response);
