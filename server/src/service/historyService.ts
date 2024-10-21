@@ -42,6 +42,7 @@ class HistoryService {
       }
       // update the file using writeFile()
       await fs.writeFile(`${process.env.SEARCH_HISTORY_LOCATION}`, JSON.stringify(jsonOut), (err) =>{
+        console.log(`${process.env.SEARCH_HISTORY_LOCATION}`);
         if (err)
           throw new Error(`Could not write to file`);
       });
