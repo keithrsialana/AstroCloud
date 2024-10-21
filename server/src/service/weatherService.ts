@@ -62,7 +62,7 @@ class WeatherService {
       if (response.ok){
         const data = await response.json();
         return data;
-      }else{throw new Error('Could not get forecast data from OpenWeatherMap API');}
+      }else{throw new Error(`Could not get forecast data from OpenWeatherMap API [${response.status}]:${response.statusText}`);}
     }catch(err){
       console.error(`[ERROR] Something went wrong: ${err}`)
       return null;
@@ -125,21 +125,30 @@ class WeatherService {
   // Complete getWeatherForCity method
   async getWeatherForCity(city: string) {
     const newWeatherObj = new Weather(city); // incomplete weather object
-
-    // get list of weather objects to return to weatherRoutes.ts
-    const forecastData:any = await this.fetchForecastData(newWeatherObj); // get unfiltered response data
-    const forecastList:Weather[] = await this.buildForecastArray(newWeatherObj, forecastData); // filter forecast data
-    
-    // get current weather data
-    const weatherData:any = await this.fetchWeatherData(newWeatherObj); // get unfiltered response data
-    const currentWeather:Weather = await this.parseCurrentWeather(weatherData);
-
-    // add current weather to top of forecast weather list and add again if list is still less than 6
-    while(forecastList.length < 6){
-      forecastList.unshift(currentWeather);
+    try{
+      // get list of weather objects to return to weatherRoutes.ts
+      const forecastData:any = await this.fetchForecastData(newWeatherObj); // get unfiltered response data
+      let forecastList:Weather[] = [];
+      if (forecastData)
+        forecastList = await this.buildForecastArray(newWeatherObj, forecastData); // filter forecast data
+      else
+        throw new Error('Forecast Data did not return a valid value');
+      // get current weather data
+      const weatherData:any = await this.fetchWeatherData(newWeatherObj); // get unfiltered response data
+      let currentWeather:Weather = new Weather(city);
+      if (weatherData)
+        currentWeather = await this.parseCurrentWeather(weatherData);
+        
+  
+      // add current weather to top of forecast weather list and add again if list is still less than 6
+      while(forecastList.length < 6){
+        forecastList.unshift(currentWeather);
+      }
+      return forecastList;
+    }catch(err){
+      console.log(`[ERROR] ${err}`);
+      return [];
     }
-
-    return forecastList;
   }
 }
 
