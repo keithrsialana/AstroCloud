@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-DS_Store
+.DS_Store
 package-lock.json
-=======
 dist
->>>>>>> d06eee7d7496a24bce9359b955f187e49693e53d
 # Logs
 logs
 *.log
